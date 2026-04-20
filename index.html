@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prueba de Balanza</title>
+  <style>
+    :root {
+      --bg-1: #f4efe6;
+      --bg-2: #efe3d2;
+      --panel: #fffaf2cc;
+      --text: #1f1a14;
+      --muted: #6c5d4d;
+      --accent: #0f766e;
+      --accent-2: #c2410c;
+      --ok: #166534;
+      --warn: #92400e;
+      --err: #991b1b;
+      --shadow: 0 20px 50px rgba(31, 26, 20, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Avenir Next", "Nunito Sans", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, #ffffffb8 0 20%, transparent 45%),
+        radial-gradient(circle at 85% 5%, #dbeafe99 0 18%, transparent 40%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(960px, 100%);
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      border: 1px solid #fff;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: rise 450ms ease-out;
+    }
+
+    @keyframes rise {
+      from {
+        transform: translateY(12px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .top {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+      padding: 28px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      letter-spacing: 0.02em;
+    }
+
+    .title p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: var(--warn);
+      background: #ffedd5;
+      border: 1px solid #fdba74;
+      border-radius: 999px;
+      padding: 8px 12px;
+    }
+
+    .weight-card {
+      background: linear-gradient(160deg, #0f766e, #155e75);
+      color: #f8fffe;
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .weight-card small {
+      opacity: 0.82;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .weight {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status {
+      font-size: 0.95rem;
+      color: #e0f2fe;
+      opacity: 0.95;
+    }
+
+    .controls {
+      border-top: 1px solid #eadfcd;
+      border-bottom: 1px solid #eadfcd;
+      background: #fffefb;
+      padding: 16px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      display: grid;
+      gap: 4px;
+    }
+
+    input,
+    select,
+    button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid #d6c6af;
+      padding: 10px 12px;
+    }
+
+    input,
+    select {
+      background: #fff;
+      color: var(--text);
+      min-width: 110px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+    }
+
+    .btn-connect {
+      background: var(--accent);
+      color: #ecfeff;
+      font-weight: 700;
+    }
+
+    .btn-disconnect {
+      background: var(--accent-2);
+      color: #fff7ed;
+      font-weight: 700;
+    }
+
+    .log-wrap {
+      padding: 18px 28px 28px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .log-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 220px;
+      max-height: 380px;
+      overflow: auto;
+      background: #1a1612;
+      color: #f8f3ea;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid #3f3528;
+      line-height: 1.4;
+      font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.87rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .err { color: var(--err); }
+
+    @media (max-width: 800px) {
+      .top {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+
+      .controls {
+        padding: 14px 20px;
+      }
+
+      .log-wrap {
+        padding: 16px 20px 20px;
+      }
+
+      .weight {
+        font-size: 2.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="top">
+      <div class="title">
+        <h1>Prueba de balanza en navegador</h1>
+        <p>
+          Conecta tu balanza por puerto serial, mira el dato crudo y el peso detectado en tiempo real.
+        </p>
+        <div class="badge">Funciona en Chrome/Edge con Web Serial</div>
+      </div>
+      <aside class="weight-card">
+        <small>Peso detectado</small>
+        <div id="peso" class="weight">--</div>
+        <div id="estado" class="status">Sin conectar</div>
+      </aside>
+    </section>
+
+    <section class="controls">
+      <label>
+        Baud
+        <input id="baud" type="number" value="9600" min="300" step="300" />
+      </label>
+
+      <label>
+        Delimitador
+        <select id="delimiter">
+          <option value="\\r\\n">CRLF (\r\n)</option>
+          <option value="\\n">LF (\n)</option>
+          <option value="\\r">CR (\r)</option>
+        </select>
+      </label>
+
+      <button id="btnConnect" class="btn-connect">Conectar</button>
+      <button id="btnDisconnect" class="btn-disconnect" disabled>Desconectar</button>
+      <button id="btnClear">Limpiar log</button>
+    </section>
+
+    <section class="log-wrap">
+      <div class="log-head">
+        <span>Salida serial</span>
+        <span id="contador">0 lineas</span>
+      </div>
+      <pre id="log"></pre>
+      <div class="hint">
+        Nota: para usar Web Serial debes abrir esta pagina desde localhost o https. Si la abres como archivo directo y no funciona, corre un servidor local.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const pesoEl = document.getElementById("peso");
+    const estadoEl = document.getElementById("estado");
+    const logEl = document.getElementById("log");
+    const contadorEl = document.getElementById("contador");
+    const baudEl = document.getElementById("baud");
+    const delimiterEl = document.getElementById("delimiter");
+    const btnConnect = document.getElementById("btnConnect");
+    const btnDisconnect = document.getElementById("btnDisconnect");
+    const btnClear = document.getElementById("btnClear");
+
+    let port = null;
+    let reader = null;
+    let keepReading = false;
+    let lineas = 0;
+
+    function decodeDelimiter(value) {
+      return value
+        .replace(/\\r/g, "\r")
+        .replace(/\\n/g, "\n");
+    }
+
+    function setEstado(texto, tipo) {
+      estadoEl.textContent = texto;
+      estadoEl.classList.remove("ok", "warn", "err");
+      if (tipo) estadoEl.classList.add(tipo);
+    }
+
+    function agregarLog(texto) {
+      const hora = new Date().toLocaleTimeString();
+      logEl.textContent += `[${hora}] ${texto}\n`;
+      lineas += 1;
+      contadorEl.textContent = `${lineas} lineas`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function extraerPeso(texto) {
+      const match = texto.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|g)\b/i);
+      if (!match) return null;
+      return {
+        valor: Number(match[1].replace(",", ".")),
+        unidad: match[2].toLowerCase()
+      };
+    }
+
+    async function conectar() {
+      if (!("serial" in navigator)) {
+        setEstado("Tu navegador no soporta Web Serial", "err");
+        agregarLog("ERROR: Web Serial no disponible.");
+        return;
+      }
+
+      try {
+        btnConnect.disabled = true;
+        const baudRate = Number(baudEl.value || 9600);
+        const delimiter = decodeDelimiter(delimiterEl.value);
+
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: "none" });
+
+        keepReading = true;
+        btnDisconnect.disabled = false;
+        setEstado(`Conectado (${baudRate} baud)`, "ok");
+        agregarLog(`Conectado. Delimitador: ${JSON.stringify(delimiter)}.`);
+
+        const textDecoder = new TextDecoderStream();
+        port.readable.pipeTo(textDecoder.writable).catch(() => {});
+
+        const inputStream = textDecoder.readable;
+        reader = inputStream.getReader();
+
+        let buffer = "";
+
+        while (keepReading) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (!value) continue;
+
+          buffer += value;
+          const partes = buffer.split(delimiter);
+          buffer = partes.pop() || "";
+
+          for (const linea of partes) {
+            const txt = String(linea).trim();
+            if (!txt) continue;
+
+            agregarLog(`RAW: ${txt}`);
+
+            const peso = extraerPeso(txt);
+            if (peso) {
+              pesoEl.textContent = `${peso.valor} ${peso.unidad}`;
+            }
+          }
+        }
+      } catch (error) {
+        setEstado("Error al conectar", "err");
+        agregarLog(`ERROR: ${error.message}`);
+        await desconectar();
+      } finally {
+        btnConnect.disabled = false;
+      }
+    }
+
+    async function desconectar() {
+      keepReading = false;
+
+      try {
+        if (reader) {
+          await reader.cancel();
+          reader.releaseLock();
+          reader = null;
+        }
+      } catch (_) {
+        // Ignorar errores al cerrar lectura.
+      }
+
+      try {
+        if (port) {
+          await port.close();
+          port = null;
+        }
+      } catch (_) {
+        // Ignorar errores al cerrar puerto.
+      }
+
+      btnDisconnect.disabled = true;
+      setEstado("Sin conectar", "warn");
+      agregarLog("Desconectado.");
+    }
+
+    btnConnect.addEventListener("click", conectar);
+    btnDisconnect.addEventListener("click", desconectar);
+    btnClear.addEventListener("click", () => {
+      lineas = 0;
+      contadorEl.textContent = "0 lineas";
+      logEl.textContent = "";
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if (port) {
+        desconectar();
+      }
+    });
+  </script>
+</body>
+</html>
