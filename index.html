@@ -323,12 +323,15 @@
     }
 
     function extraerPeso(texto) {
-      let match = texto.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|g|lb|oz)\b/i);
+      // Patrón 1: número + unidad, con múltiples espacios en blanco
+      let match = texto.match(/[\s,+\-]*(\d+(?:[.,]\d+)?)\s*(kg|g|lb|oz)\b/i);
       if (match) return { valor: Number(match[1].replace(',', '.')), unidad: match[2].toLowerCase() };
       
-      match = texto.match(/(-?\d+[.,]\d+)/);
+      // Patrón 2: número flotante sin unidad
+      match = texto.match(/(\d+[.,]\d+)/);
       if (match) return { valor: Number(match[1].replace(',', '.')), unidad: 'kg' };
       
+      // Patrón 3: solo entero
       match = texto.match(/^[\s]*(\d+)[\s]*$/);
       if (match && Number(match[1]) > 0) return { valor: Number(match[1]), unidad: 'g' };
       
