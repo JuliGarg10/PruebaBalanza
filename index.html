@@ -18,25 +18,21 @@
       --err: #991b1b;
       --shadow: 0 20px 50px rgba(31, 26, 20, 0.15);
     }
-
     * {
       box-sizing: border-box;
     }
-
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--text);
       font-family: "Avenir Next", "Nunito Sans", "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 15% 15%, #ffffffb8 0 20%, transparent 45%),
+      background: radial-gradient(circle at 15% 15%, #ffffffb8 0 20%, transparent 45%),
         radial-gradient(circle at 85% 5%, #dbeafe99 0 18%, transparent 40%),
         linear-gradient(135deg, var(--bg-1), var(--bg-2));
       display: grid;
       place-items: center;
       padding: 24px;
     }
-
     .app {
       width: min(960px, 100%);
       background: var(--panel);
@@ -47,7 +43,6 @@
       overflow: hidden;
       animation: rise 450ms ease-out;
     }
-
     @keyframes rise {
       from {
         transform: translateY(12px);
@@ -58,26 +53,22 @@
         opacity: 1;
       }
     }
-
     .top {
       display: grid;
       grid-template-columns: 1.2fr 0.8fr;
       gap: 20px;
       padding: 28px;
     }
-
     .title h1 {
       margin: 0;
       font-size: clamp(1.5rem, 3vw, 2.4rem);
       letter-spacing: 0.02em;
     }
-
     .title p {
       margin: 10px 0 0;
       color: var(--muted);
       line-height: 1.45;
     }
-
     .badge {
       display: inline-flex;
       align-items: center;
@@ -90,7 +81,6 @@
       border-radius: 999px;
       padding: 8px 12px;
     }
-
     .weight-card {
       background: linear-gradient(160deg, #0f766e, #155e75);
       color: #f8fffe;
@@ -100,26 +90,22 @@
       align-content: center;
       gap: 8px;
     }
-
     .weight-card small {
       opacity: 0.82;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
-
     .weight {
       font-size: clamp(2rem, 5vw, 3.2rem);
       font-weight: 700;
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
-
     .status {
       font-size: 0.95rem;
       color: #e0f2fe;
       opacity: 0.95;
     }
-
     .controls {
       border-top: 1px solid #eadfcd;
       border-bottom: 1px solid #eadfcd;
@@ -130,14 +116,12 @@
       gap: 10px;
       align-items: center;
     }
-
     label {
       font-size: 0.88rem;
       color: var(--muted);
       display: grid;
       gap: 4px;
     }
-
     input,
     select,
     button {
@@ -146,48 +130,40 @@
       border: 1px solid #d6c6af;
       padding: 10px 12px;
     }
-
     input,
     select {
       background: #fff;
       color: var(--text);
       min-width: 110px;
     }
-
     button {
       cursor: pointer;
       border: none;
       transition: transform 120ms ease, opacity 120ms ease;
     }
-
     button:hover {
       transform: translateY(-1px);
     }
-
     button:disabled {
       cursor: not-allowed;
       opacity: 0.6;
       transform: none;
     }
-
     .btn-connect {
       background: var(--accent);
       color: #ecfeff;
       font-weight: 700;
     }
-
     .btn-disconnect {
       background: var(--accent-2);
       color: #fff7ed;
       font-weight: 700;
     }
-
     .log-wrap {
       padding: 18px 28px 28px;
       display: grid;
       gap: 10px;
     }
-
     .log-head {
       display: flex;
       justify-content: space-between;
@@ -195,7 +171,6 @@
       color: var(--muted);
       font-size: 0.92rem;
     }
-
     pre {
       margin: 0;
       min-height: 220px;
@@ -212,31 +187,25 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
-
     .hint {
       color: var(--muted);
       font-size: 0.88rem;
       line-height: 1.45;
     }
-
     .ok { color: var(--ok); }
     .warn { color: var(--warn); }
     .err { color: var(--err); }
-
     @media (max-width: 800px) {
       .top {
         grid-template-columns: 1fr;
         padding: 20px;
       }
-
       .controls {
         padding: 14px 20px;
       }
-
       .log-wrap {
         padding: 16px 20px 20px;
       }
-
       .weight {
         font-size: 2.4rem;
       }
@@ -248,9 +217,7 @@
     <section class="top">
       <div class="title">
         <h1>Prueba de balanza en navegador</h1>
-        <p>
-          Conecta tu balanza por puerto serial, mira el dato crudo y el peso detectado en tiempo real.
-        </p>
+        <p>Conecta tu balanza por puerto serial, mira el dato crudo y el peso detectado en tiempo real.</p>
         <div class="badge">Funciona en Chrome/Edge con Web Serial</div>
       </div>
       <aside class="weight-card">
@@ -263,9 +230,13 @@
     <section class="controls">
       <label>
         Baud
-        <input id="baud" type="number" value="9600" min="300" step="300" />
+        <select id="baud">
+          <option value="2400">2400</option>
+          <option value="4800">4800</option>
+          <option value="9600" selected>9600</option>
+          <option value="19200">19200</option>
+        </select>
       </label>
-
       <label>
         Delimitador
         <select id="delimiter">
@@ -274,20 +245,20 @@
           <option value="\\r">CR (\r)</option>
         </select>
       </label>
-
       <button id="btnConnect" class="btn-connect">Conectar</button>
       <button id="btnDisconnect" class="btn-disconnect" disabled>Desconectar</button>
       <button id="btnClear">Limpiar log</button>
     </section>
 
     <section class="controls" style="background: #f5efe5; border-top: none;">
-      <label style="color: var(--text); font-weight: 600;">Enviar comando a balanza:</label>
-      <button id="btnCmdR" disabled>Enviar R</button>
-      <button id="btnCmdP" disabled>Enviar P</button>
-      <button id="btnCmdT" disabled>Enviar T</button>
-      <label style="flex: 1;">
-        Personalizado
-        <input id="cmdCustom" type="text" placeholder="ej: R (enviar y presionar Enter)" />
+      <label style="color: var(--text); font-weight: 600;">Enviar comando:</label>
+      <button id="btnCmdR" disabled>R</button>
+      <button id="btnCmdP" disabled>P</button>
+      <button id="btnCmdW" disabled>W</button>
+      <button id="btnCmdS" disabled>S</button>
+      <button id="btnCmdT" disabled>T</button>
+      <label style="flex: 1; margin-left: 10px;">
+        <input id="cmdCustom" type="text" placeholder="Personalizado" />
       </label>
       <button id="btnCmdSend" disabled>Enviar</button>
     </section>
@@ -299,28 +270,30 @@
       </div>
       <pre id="log"></pre>
       <div class="hint">
-        <strong>Para balanzas BBG:</strong> Presiona el botón de transmisión en la balanza o usa modo automático si está configurado. 
-        Si no ves datos, intenta cambiar el baud rate (4800, 2400) o el delimitador.<br>
-        <strong>Nota técnica:</strong> Web Serial funciona en Chrome/Edge desde localhost o https.
+        <strong>Instrucciones:</strong> Presiona "Conectar", luego intenta los botones de comando (R, P, W, S, T). 
+        Si nada funciona, prueba cambiar Baud rate a 4800 o 2400.
+        Para balanzas BBG, presiona el botón físico de transmisión en la balanza después de enviar un comando.
       </div>
     </section>
   </main>
 
   <script>
-    const pesoEl = document.getElementById("peso");
-    const estadoEl = document.getElementById("estado");
-    const logEl = document.getElementById("log");
-    const contadorEl = document.getElementById("contador");
-    const baudEl = document.getElementById("baud");
-    const delimiterEl = document.getElementById("delimiter");
-    const btnConnect = document.getElementById("btnConnect");
-    const btnDisconnect = document.getElementById("btnDisconnect");
-    const btnClear = document.getElementById("btnClear");
-    const btnCmdR = document.getElementById("btnCmdR");
-    const btnCmdP = document.getElementById("btnCmdP");
-    const btnCmdT = document.getElementById("btnCmdT");
-    const btnCmdSend = document.getElementById("btnCmdSend");
-    const cmdCustom = document.getElementById("cmdCustom");
+    const pesoEl = document.getElementById('peso');
+    const estadoEl = document.getElementById('estado');
+    const logEl = document.getElementById('log');
+    const contadorEl = document.getElementById('contador');
+    const baudEl = document.getElementById('baud');
+    const delimiterEl = document.getElementById('delimiter');
+    const btnConnect = document.getElementById('btnConnect');
+    const btnDisconnect = document.getElementById('btnDisconnect');
+    const btnClear = document.getElementById('btnClear');
+    const btnCmdR = document.getElementById('btnCmdR');
+    const btnCmdP = document.getElementById('btnCmdP');
+    const btnCmdW = document.getElementById('btnCmdW');
+    const btnCmdS = document.getElementById('btnCmdS');
+    const btnCmdT = document.getElementById('btnCmdT');
+    const btnCmdSend = document.getElementById('btnCmdSend');
+    const cmdCustom = document.getElementById('cmdCustom');
 
     let port = null;
     let reader = null;
@@ -329,14 +302,12 @@
     let lineas = 0;
 
     function decodeDelimiter(value) {
-      return value
-        .replace(/\\r/g, "\r")
-        .replace(/\\n/g, "\n");
+      return value.replace(/\\r/g, '\r').replace(/\\n/g, '\n');
     }
 
     function setEstado(texto, tipo) {
       estadoEl.textContent = texto;
-      estadoEl.classList.remove("ok", "warn", "err");
+      estadoEl.classList.remove('ok', 'warn', 'err');
       if (tipo) estadoEl.classList.add(tipo);
     }
 
@@ -349,46 +320,22 @@
     }
 
     function extraerPeso(texto) {
-      // Intenta detectar peso en múltiples formatos:
-      // 1. "123.45 kg" o "123.45kg"
-      // 2. "  123.45" (solo número con espacios)
-      // 3. "123,45" (coma decimal)
-      // 4. Números al inicio/final de la línea
-
-      // Patrón 1: número + unidad (kg, g, etc)
       let match = texto.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|g|lb|oz)\b/i);
-      if (match) {
-        return {
-          valor: Number(match[1].replace(",", ".")),
-          unidad: match[2].toLowerCase()
-        };
-      }
-
-      // Patrón 2: número flotante sin unidad (típico de BBG)
+      if (match) return { valor: Number(match[1].replace(',', '.')), unidad: match[2].toLowerCase() };
+      
       match = texto.match(/(-?\d+[.,]\d+)/);
-      if (match) {
-        return {
-          valor: Number(match[1].replace(",", ".")),
-          unidad: "kg"
-        };
-      }
-
-      // Patrón 3: solo entero (peso en gramos u otra unidad)
+      if (match) return { valor: Number(match[1].replace(',', '.')), unidad: 'kg' };
+      
       match = texto.match(/^[\s]*(\d+)[\s]*$/);
-      if (match && Number(match[1]) > 0) {
-        return {
-          valor: Number(match[1]),
-          unidad: "g"
-        };
-      }
-
+      if (match && Number(match[1]) > 0) return { valor: Number(match[1]), unidad: 'g' };
+      
       return null;
     }
 
     async function conectar() {
-      if (!("serial" in navigator)) {
-        setEstado("Tu navegador no soporta Web Serial", "err");
-        agregarLog("ERROR: Web Serial no disponible.");
+      if (!('serial' in navigator)) {
+        setEstado('Web Serial no disponible', 'err');
+        agregarLog('ERROR: Web Serial no soportado en este navegador.');
         return;
       }
 
@@ -398,25 +345,25 @@
         const delimiter = decodeDelimiter(delimiterEl.value);
 
         port = await navigator.serial.requestPort();
-        await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: "none" });
+        await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none' });
 
         keepReading = true;
         btnDisconnect.disabled = false;
         btnCmdR.disabled = false;
         btnCmdP.disabled = false;
+        btnCmdW.disabled = false;
+        btnCmdS.disabled = false;
         btnCmdT.disabled = false;
         btnCmdSend.disabled = false;
         writer = port.writable.getWriter();
-        setEstado(`Conectado (${baudRate} baud)`, "ok");
-        agregarLog(`Conectado. Delimitador: ${JSON.stringify(delimiter)}. Ahora puedes enviar comandos.`);
+        setEstado(`Conectado (${baudRate} baud)`, 'ok');
+        agregarLog(`OK. Baud=${baudRate}. Delimitador=${JSON.stringify(delimiter)}`);
 
         const textDecoder = new TextDecoderStream();
         port.readable.pipeTo(textDecoder.writable).catch(() => {});
-
         const inputStream = textDecoder.readable;
         reader = inputStream.getReader();
-
-        let buffer = "";
+        let buffer = '';
 
         while (keepReading) {
           const { value, done } = await reader.read();
@@ -425,15 +372,14 @@
 
           buffer += value;
           const partes = buffer.split(delimiter);
-          buffer = partes.pop() || "";
+          buffer = partes.pop() || '';
 
           for (const linea of partes) {
             const txt = String(linea).trim();
             if (!txt) continue;
 
-            // Mostrar texto + hex para debuggear
             const hex = Array.from(linea).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
-            agregarLog(`RAW: ${txt} [HEX: ${hex}]`);
+            agregarLog(`RX: ${txt} [HEX: ${hex}]`);
 
             const peso = extraerPeso(txt);
             if (peso) {
@@ -442,7 +388,7 @@
           }
         }
       } catch (error) {
-        setEstado("Error al conectar", "err");
+        setEstado('Error al conectar', 'err');
         agregarLog(`ERROR: ${error.message}`);
         await desconectar();
       } finally {
@@ -466,76 +412,75 @@
           reader.releaseLock();
           reader = null;
         }
-      } catch (_) {
-        // Ignorar errores al cerrar lectura.
-      }
+      } catch (_) {}
 
       try {
         if (port) {
           await port.close();
           port = null;
         }
-      } catch (_) {
-        // Ignorar errores al cerrar puerto.
-      }
+      } catch (_) {}
 
       btnDisconnect.disabled = true;
       btnCmdR.disabled = true;
       btnCmdP.disabled = true;
+      btnCmdW.disabled = true;
+      btnCmdS.disabled = true;
       btnCmdT.disabled = true;
       btnCmdSend.disabled = true;
-      setEstado("Sin conectar", "warn");
-      agregarLog("Desconectado.");
+      setEstado('Sin conectar', 'warn');
+      agregarLog('Desconectado.');
     }
 
     async function enviarComando(cmd) {
       if (!writer) {
-        agregarLog("ERROR: No conectado.");
+        agregarLog('ERROR: No conectado.');
         return;
       }
       try {
         const encoder = new TextEncoder();
         await writer.write(encoder.encode(cmd));
-        agregarLog(`ENVIADO: "${cmd}" [HEX: ${Array.from(cmd).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')}]`);
+        const hex = Array.from(cmd).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
+        agregarLog(`TX: ${cmd} [HEX: ${hex}]`);
       } catch (error) {
-        agregarLog(`ERROR al enviar: ${error.message}`);
+        agregarLog(`ERROR TX: ${error.message}`);
       }
     }
 
-    btnConnect.addEventListener("click", conectar);
-    btnDisconnect.addEventListener("click", desconectar);
-    btnClear.addEventListener("click", () => {
+    btnConnect.addEventListener('click', conectar);
+    btnDisconnect.addEventListener('click', desconectar);
+    btnClear.addEventListener('click', () => {
       lineas = 0;
-      contadorEl.textContent = "0 lineas";
-      logEl.textContent = "";
+      contadorEl.textContent = '0 lineas';
+      logEl.textContent = '';
     });
 
-    btnCmdR.addEventListener("click", () => enviarComando("R\r\n"));
-    btnCmdP.addEventListener("click", () => enviarComando("P\r\n"));
-    btnCmdT.addEventListener("click", () => enviarComando("T\r\n"));
+    btnCmdR.addEventListener('click', () => enviarComando('R\r\n'));
+    btnCmdP.addEventListener('click', () => enviarComando('P\r\n'));
+    btnCmdW.addEventListener('click', () => enviarComando('W\r\n'));
+    btnCmdS.addEventListener('click', () => enviarComando('S\r\n'));
+    btnCmdT.addEventListener('click', () => enviarComando('T\r\n'));
     
-    btnCmdSend.addEventListener("click", () => {
+    btnCmdSend.addEventListener('click', () => {
       const cmd = cmdCustom.value;
       if (cmd) {
         enviarComando(cmd);
-        cmdCustom.value = "";
+        cmdCustom.value = '';
       }
     });
 
-    cmdCustom.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
+    cmdCustom.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
         const cmd = cmdCustom.value;
         if (cmd) {
           enviarComando(cmd);
-          cmdCustom.value = "";
+          cmdCustom.value = '';
         }
       }
     });
 
-    window.addEventListener("beforeunload", () => {
-      if (port) {
-        desconectar();
-      }
+    window.addEventListener('beforeunload', () => {
+      if (port) desconectar();
     });
   </script>
 </body>
