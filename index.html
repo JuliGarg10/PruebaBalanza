@@ -317,6 +317,7 @@
     function agregarLog(texto) {
       const hora = new Date().toLocaleTimeString();
       logEl.textContent += `[${hora}] ${texto}\n`;
+      console.log(`[BALANZA ${hora}] ${texto}`);
       lineas += 1;
       contadorEl.textContent = `${lineas} lineas`;
       logEl.scrollTop = logEl.scrollHeight;
@@ -325,7 +326,7 @@
     function extraerPeso(texto) {
       // Busca número + unidad en cualquier parte del texto
       // Ej: "US,GS,+     1.00kg" → 1.00 kg
-      let match = texto.match(/(\d+[.,]\d+)\s*(kg|g|lb|oz)/i);
+      let match = texto.match(/([+-]?\d+(?:[.,]\d+)?)\s*(kg|g|lb|oz)/i);
       if (match) {
         return {
           valor: Number(match[1].replace(',', '.')),
@@ -343,6 +344,29 @@
       }
       
       return null;
+    }
+
+    function hexDeTexto(texto) {
+      return Array.from(texto)
+        .map(c => c.charCodeAt(0).toString(16).padStart(2, '0'))
+        .join(' ');
+    }
+
+    function procesarBuffer(buffer) {
+      const candidatos = [];
+      const patronConUnidad = /([+-]?\d+(?:[.,]\d+)?)\s*(kg|g|lb|oz)/ig;
+      let m;
+
+      while ((m = patronConUnidad.exec(buffer)) !== null) {
+        const valor = Number(m[1].replace(',', '.'));
+        const unidad = m[2].toLowerCase();
+        const inicio = Math.max(0, m.index - 12);
+        const fin = Math.min(buffer.length, m.index + m[0].length + 12);
+        const contexto = buffer.slice(inicio, fin).replace(/[\r\n]+/g, ' ').trim();
+        candidatos.push({ valor, unidad, contexto });
+      }
+
+      return candidatos;
     }
 
     async function conectar() {
@@ -380,6 +404,8 @@
         reader = inputStream.getReader();
         let buffer = '';
         let bytesRecibidos = 0;
+        let ultimaLecturaLog = 0;
+        let ultimoPesoTexto = '';
 
         while (keepReading) {
           const { value, done } = await reader.read();
@@ -387,23 +413,32 @@
           if (!value) continue;
 
           bytesRecibidos += value.length;
-          agregarLog(`[RECIBIDO ${bytesRecibidos} bytes]`);
-          
+          const trozoHex = hexDeTexto(value);
+          agregarLog(`[RECIBIDO ${bytesRecibidos} bytes] CHUNK=\"${value.replace(/[\r\n]/g, ' ')}\" HEX=${trozoHex}`);
+
           buffer += value;
-          const partes = buffer.split(delimiter);
-          buffer = partes.pop() || '';
 
-          for (const linea of partes) {
-            const txt = String(linea).trim();
-            if (!txt) continue;
+          // Mantiene buffer acotado para evitar crecimiento infinito.
+          if (buffer.length > 4000) {
+            buffer = buffer.slice(-2000);
+          }
 
-            const hex = Array.from(linea).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
-            agregarLog(`RX: "${txt}" [HEX: ${hex}]`);
+          const pesos = procesarBuffer(buffer);
+          if (pesos.length > 0) {
+            const ultimo = pesos[pesos.length - 1];
+            const pesoTxt = `${ultimo.valor} ${ultimo.unidad}`;
+            pesoEl.textContent = pesoTxt;
 
-            const peso = extraerPeso(txt);
-            if (peso) {
-              pesoEl.textContent = `${peso.valor} ${peso.unidad}`;
-              agregarLog(`  ✓ PESO: ${peso.valor} ${peso.unidad}`);
+            if (pesoTxt !== ultimoPesoTexto) {
+              ultimoPesoTexto = pesoTxt;
+              agregarLog(`✓ PESO DETECTADO: ${pesoTxt} | CONTEXTO: \"${ultimo.contexto}\"`);
+            }
+          } else {
+            const ahora = Date.now();
+            if (ahora - ultimaLecturaLog > 1500) {
+              ultimaLecturaLog = ahora;
+              const cola = buffer.slice(-100).replace(/[\r\n]+/g, ' ').trim();
+              agregarLog(`(sin match de peso aun) cola=\"${cola}\"`);
             }
           }
         }
