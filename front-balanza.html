@@ -370,21 +370,25 @@
         btnCmdSend.disabled = false;
         writer = port.writable.getWriter();
         setEstado(`Conectado (${baudRate} baud)`, 'ok');
-        agregarLog(`✓ Conectado al puerto serial`);
-        agregarLog(`  Baud: ${baudRate}, Delimitador: ${JSON.stringify(delimiter)}`);
-        agregarLog(`  Ahora presiona botones en la balanza o usa los botones de arriba.`);
+        agregarLog(`✓ Puerto abierto. COM2, ${baudRate} baud`);
+        agregarLog(`  Presiona botones en la balanza o los comandos arriba.`);
+        agregarLog(`  Esperando datos...`);
 
         const textDecoder = new TextDecoderStream();
         port.readable.pipeTo(textDecoder.writable).catch(() => {});
         const inputStream = textDecoder.readable;
         reader = inputStream.getReader();
         let buffer = '';
+        let bytesRecibidos = 0;
 
         while (keepReading) {
           const { value, done } = await reader.read();
           if (done) break;
           if (!value) continue;
 
+          bytesRecibidos += value.length;
+          agregarLog(`[RECIBIDO ${bytesRecibidos} bytes]`);
+          
           buffer += value;
           const partes = buffer.split(delimiter);
           buffer = partes.pop() || '';
@@ -399,9 +403,7 @@
             const peso = extraerPeso(txt);
             if (peso) {
               pesoEl.textContent = `${peso.valor} ${peso.unidad}`;
-              agregarLog(`  ✓ PESO DETECTADO: ${peso.valor} ${peso.unidad}`);
-            } else {
-              agregarLog(`  (sin peso detectado)`);
+              agregarLog(`  ✓ PESO: ${peso.valor} ${peso.unidad}`);
             }
           }
         }
