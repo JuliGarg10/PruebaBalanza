@@ -378,7 +378,9 @@
             const txt = String(linea).trim();
             if (!txt) continue;
 
-            agregarLog(`RAW: ${txt}`);
+            // Mostrar texto + hex para debuggear
+            const hex = Array.from(linea).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
+            agregarLog(`RAW: ${txt} [HEX: ${hex}]`);
 
             const peso = extraerPeso(txt);
             if (peso) {
