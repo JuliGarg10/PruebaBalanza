@@ -270,9 +270,12 @@
       </div>
       <pre id="log"></pre>
       <div class="hint">
-        <strong>Instrucciones:</strong> Presiona "Conectar", luego intenta los botones de comando (R, P, W, S, T). 
-        Si nada funciona, prueba cambiar Baud rate a 4800 o 2400.
-        Para balanzas BBG, presiona el botón físico de transmisión en la balanza después de enviar un comando.
+        <strong>Desde Windows:</strong><br>
+        1. Presiona "Conectar" y selecciona tu puerto COM<br>
+        2. Si dice "Conectado", presiona botones en la balanza<br>
+        3. Si NO aparecen datos, prueba cambiar Baud a 4800 o 2400<br>
+        4. Cada dato que llegue aparecerá aquí abajo en "Salida serial"<br>
+        <strong>Nota:</strong> Si conecta pero no ve datos, la balanza puede necesitar un botón especial de transmisión.
       </div>
     </section>
   </main>
@@ -357,7 +360,9 @@
         btnCmdSend.disabled = false;
         writer = port.writable.getWriter();
         setEstado(`Conectado (${baudRate} baud)`, 'ok');
-        agregarLog(`OK. Baud=${baudRate}. Delimitador=${JSON.stringify(delimiter)}`);
+        agregarLog(`✓ Conectado a ${portPath || 'puerto serial'}`);
+        agregarLog(`  Baud: ${baudRate}, Delimitador: ${JSON.stringify(delimiter)}`);
+        agregarLog(`  Ahora presiona botones en la balanza o usa los botones de arriba.`);
 
         const textDecoder = new TextDecoderStream();
         port.readable.pipeTo(textDecoder.writable).catch(() => {});
@@ -389,7 +394,11 @@
         }
       } catch (error) {
         setEstado('Error al conectar', 'err');
-        agregarLog(`ERROR: ${error.message}`);
+        agregarLog(`❌ ERROR: ${error.message}`);
+        agregarLog(`Verifica que:`);
+        agregarLog(`  1. La balanza esté conectada al puerto seleccionado`);
+        agregarLog(`  2. El baud rate sea correcto (intenta 4800 o 2400)`);
+        agregarLog(`  3. No haya otro programa usando el mismo puerto`);
         await desconectar();
       } finally {
         btnConnect.disabled = false;
