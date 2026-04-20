@@ -287,7 +287,9 @@
       </div>
       <pre id="log"></pre>
       <div class="hint">
-        Nota: para usar Web Serial debes abrir esta pagina desde localhost o https. Si la abres como archivo directo y no funciona, corre un servidor local.
+        <strong>Para balanzas BBG:</strong> Presiona el botón de transmisión en la balanza o usa modo automático si está configurado. 
+        Si no ves datos, intenta cambiar el baud rate (4800, 2400) o el delimitador.<br>
+        <strong>Nota técnica:</strong> Web Serial funciona en Chrome/Edge desde localhost o https.
       </div>
     </section>
   </main>
@@ -329,12 +331,40 @@
     }
 
     function extraerPeso(texto) {
-      const match = texto.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|g)\b/i);
-      if (!match) return null;
-      return {
-        valor: Number(match[1].replace(",", ".")),
-        unidad: match[2].toLowerCase()
-      };
+      // Intenta detectar peso en múltiples formatos:
+      // 1. "123.45 kg" o "123.45kg"
+      // 2. "  123.45" (solo número con espacios)
+      // 3. "123,45" (coma decimal)
+      // 4. Números al inicio/final de la línea
+
+      // Patrón 1: número + unidad (kg, g, etc)
+      let match = texto.match(/(-?\d+(?:[.,]\d+)?)\s*(kg|g|lb|oz)\b/i);
+      if (match) {
+        return {
+          valor: Number(match[1].replace(",", ".")),
+          unidad: match[2].toLowerCase()
+        };
+      }
+
+      // Patrón 2: número flotante sin unidad (típico de BBG)
+      match = texto.match(/(-?\d+[.,]\d+)/);
+      if (match) {
+        return {
+          valor: Number(match[1].replace(",", ".")),
+          unidad: "kg"
+        };
+      }
+
+      // Patrón 3: solo entero (peso en gramos u otra unidad)
+      match = texto.match(/^[\s]*(\d+)[\s]*$/);
+      if (match && Number(match[1]) > 0) {
+        return {
+          valor: Number(match[1]),
+          unidad: "g"
+        };
+      }
+
+      return null;
     }
 
     async function conectar() {
