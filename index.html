@@ -360,7 +360,7 @@
         btnCmdSend.disabled = false;
         writer = port.writable.getWriter();
         setEstado(`Conectado (${baudRate} baud)`, 'ok');
-        agregarLog(`✓ Conectado a ${portPath || 'puerto serial'}`);
+        agregarLog(`✓ Conectado al puerto serial`);
         agregarLog(`  Baud: ${baudRate}, Delimitador: ${JSON.stringify(delimiter)}`);
         agregarLog(`  Ahora presiona botones en la balanza o usa los botones de arriba.`);
 
