@@ -280,6 +280,18 @@
       <button id="btnClear">Limpiar log</button>
     </section>
 
+    <section class="controls" style="background: #f5efe5; border-top: none;">
+      <label style="color: var(--text); font-weight: 600;">Enviar comando a balanza:</label>
+      <button id="btnCmdR" disabled>Enviar R</button>
+      <button id="btnCmdP" disabled>Enviar P</button>
+      <button id="btnCmdT" disabled>Enviar T</button>
+      <label style="flex: 1;">
+        Personalizado
+        <input id="cmdCustom" type="text" placeholder="ej: R (enviar y presionar Enter)" />
+      </label>
+      <button id="btnCmdSend" disabled>Enviar</button>
+    </section>
+
     <section class="log-wrap">
       <div class="log-head">
         <span>Salida serial</span>
@@ -304,9 +316,15 @@
     const btnConnect = document.getElementById("btnConnect");
     const btnDisconnect = document.getElementById("btnDisconnect");
     const btnClear = document.getElementById("btnClear");
+    const btnCmdR = document.getElementById("btnCmdR");
+    const btnCmdP = document.getElementById("btnCmdP");
+    const btnCmdT = document.getElementById("btnCmdT");
+    const btnCmdSend = document.getElementById("btnCmdSend");
+    const cmdCustom = document.getElementById("cmdCustom");
 
     let port = null;
     let reader = null;
+    let writer = null;
     let keepReading = false;
     let lineas = 0;
 
@@ -384,8 +402,13 @@
 
         keepReading = true;
         btnDisconnect.disabled = false;
+        btnCmdR.disabled = false;
+        btnCmdP.disabled = false;
+        btnCmdT.disabled = false;
+        btnCmdSend.disabled = false;
+        writer = port.writable.getWriter();
         setEstado(`Conectado (${baudRate} baud)`, "ok");
-        agregarLog(`Conectado. Delimitador: ${JSON.stringify(delimiter)}.`);
+        agregarLog(`Conectado. Delimitador: ${JSON.stringify(delimiter)}. Ahora puedes enviar comandos.`);
 
         const textDecoder = new TextDecoderStream();
         port.readable.pipeTo(textDecoder.writable).catch(() => {});
@@ -431,6 +454,13 @@
       keepReading = false;
 
       try {
+        if (writer) {
+          writer.releaseLock();
+          writer = null;
+        }
+      } catch (_) {}
+
+      try {
         if (reader) {
           await reader.cancel();
           reader.releaseLock();
@@ -450,8 +480,26 @@
       }
 
       btnDisconnect.disabled = true;
+      btnCmdR.disabled = true;
+      btnCmdP.disabled = true;
+      btnCmdT.disabled = true;
+      btnCmdSend.disabled = true;
       setEstado("Sin conectar", "warn");
       agregarLog("Desconectado.");
+    }
+
+    async function enviarComando(cmd) {
+      if (!writer) {
+        agregarLog("ERROR: No conectado.");
+        return;
+      }
+      try {
+        const encoder = new TextEncoder();
+        await writer.write(encoder.encode(cmd));
+        agregarLog(`ENVIADO: "${cmd}" [HEX: ${Array.from(cmd).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')}]`);
+      } catch (error) {
+        agregarLog(`ERROR al enviar: ${error.message}`);
+      }
     }
 
     btnConnect.addEventListener("click", conectar);
@@ -460,6 +508,28 @@
       lineas = 0;
       contadorEl.textContent = "0 lineas";
       logEl.textContent = "";
+    });
+
+    btnCmdR.addEventListener("click", () => enviarComando("R\r\n"));
+    btnCmdP.addEventListener("click", () => enviarComando("P\r\n"));
+    btnCmdT.addEventListener("click", () => enviarComando("T\r\n"));
+    
+    btnCmdSend.addEventListener("click", () => {
+      const cmd = cmdCustom.value;
+      if (cmd) {
+        enviarComando(cmd);
+        cmdCustom.value = "";
+      }
+    });
+
+    cmdCustom.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const cmd = cmdCustom.value;
+        if (cmd) {
+          enviarComando(cmd);
+          cmdCustom.value = "";
+        }
+      }
     });
 
     window.addEventListener("beforeunload", () => {
