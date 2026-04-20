@@ -323,17 +323,24 @@
     }
 
     function extraerPeso(texto) {
-      // Patrón 1: número + unidad, con múltiples espacios en blanco
-      let match = texto.match(/[\s,+\-]*(\d+(?:[.,]\d+)?)\s*(kg|g|lb|oz)\b/i);
-      if (match) return { valor: Number(match[1].replace(',', '.')), unidad: match[2].toLowerCase() };
+      // Busca número + unidad en cualquier parte del texto
+      // Ej: "US,GS,+     1.00kg" → 1.00 kg
+      let match = texto.match(/(\d+[.,]\d+)\s*(kg|g|lb|oz)/i);
+      if (match) {
+        return {
+          valor: Number(match[1].replace(',', '.')),
+          unidad: match[2].toLowerCase()
+        };
+      }
       
-      // Patrón 2: número flotante sin unidad
+      // Intenta solo número flotante
       match = texto.match(/(\d+[.,]\d+)/);
-      if (match) return { valor: Number(match[1].replace(',', '.')), unidad: 'kg' };
-      
-      // Patrón 3: solo entero
-      match = texto.match(/^[\s]*(\d+)[\s]*$/);
-      if (match && Number(match[1]) > 0) return { valor: Number(match[1]), unidad: 'g' };
+      if (match) {
+        return {
+          valor: Number(match[1].replace(',', '.')),
+          unidad: 'kg'
+        };
+      }
       
       return null;
     }
@@ -387,11 +394,14 @@
             if (!txt) continue;
 
             const hex = Array.from(linea).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
-            agregarLog(`RX: ${txt} [HEX: ${hex}]`);
+            agregarLog(`RX: "${txt}" [HEX: ${hex}]`);
 
             const peso = extraerPeso(txt);
             if (peso) {
               pesoEl.textContent = `${peso.valor} ${peso.unidad}`;
+              agregarLog(`  ✓ PESO DETECTADO: ${peso.valor} ${peso.unidad}`);
+            } else {
+              agregarLog(`  (sin peso detectado)`);
             }
           }
         }
